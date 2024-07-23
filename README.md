@@ -2,7 +2,7 @@
 
 # How to run
 Clone the repo to your local device, then open up a terminal in the directory of the project. In there you should also have the desired .csv files (you can copy them from the LSE/NYSE/NASDAQ directories). You can then execute the script using the following commands:
-- python main.py` this will attempt to read, predict and write the output .csv files in the /predictions directory. Note that this does not take into account the number of .csv files in the pwd. For that you can use:
+- `python main.py` this will attempt to read, predict and write the output .csv files in the /predictions directory. Note that this does not take into account the number of .csv files in the pwd. For that you can use:
 - `python main.py 1` - which will only process one file
 - `python main.py 2` - which will process two files, as stated in the Tech Challenge Data & Inputs.
 
