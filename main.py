@@ -1,4 +1,5 @@
 import csv
+import os
 import random
 from glob import glob
 from datetime import datetime, timedelta
@@ -21,6 +22,7 @@ def get_pwd_csvs():
 def write_csv(file, output_data):
     new_file_name = file.replace('.csv', '_predict.csv')
     path = 'predictions/' + new_file_name
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=HEADER)
         writer.writeheader() # add csv headers
@@ -38,7 +40,7 @@ def read_input_csv(filename):
 def get_predicted_data(input_data):
     # make an array of stock values only (for ease of use)
     stock_values = [  float(item['value']) for item in input_data]
-    n = stock_values[-1]
+    n = stock_values[-1] # select newest value
 
     # first predicted (n+1) data point is same as the 2nd highest value present in the 10 data points
     dup_list = list(set(stock_values)) # remove duplicate stock values
