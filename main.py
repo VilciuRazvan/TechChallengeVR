@@ -3,32 +3,40 @@ import random
 from glob import glob
 from datetime import datetime, timedelta
 
+HEADER = ['tick', 'date', 'value']
 
-''' TODO add exception handling when
-    - no file found
-    - wrong format
-    - more TBD
-    - check if input file has at least 10 rows
-
-    - add something interative in the cli like : select file from pwd 1.ASH.csv, 2.NMR.csv and read/predict for that file
-'''
 def main():
-    input_data = read_input_csv(0)
-    get_predicted_data(input_data)
-    output_data = get_predicted_data(input_data)
+    filenames = get_pwd_csvs() # get all .csv file names in the current directory
+    for file in filenames:
+        input_data = read_input_csv(file) # read .csv content into a list dict
+        output_data = get_predicted_data(input_data) # return the input + predicted values into a list dict
+        write_csv(file, output_data)
+        
+def get_pwd_csvs():
+    filenames = glob("*.csv") # get the .csv filename from the current folder
+    if (len(filenames) < 1):
+        raise Exception("No .csv files found in the current working directory.")
+    return filenames
 
-# files_count - number of files to read from the pwd (1 or 2)
-def read_input_csv(file_number):
-    filename = glob("*.csv") # get the .csv filename from the current folder
-    with open(filename[file_number], 'r') as file:
-        csv_reader = csv.DictReader(file, fieldnames=['tick', 'date', 'value'])
+def write_csv(file, output_data):
+    new_file_name = file.replace('.csv', '_predict.csv')
+    path = 'predictions/' + new_file_name
+    with open(path, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=HEADER)
+        writer.writeheader() # add csv headers
+        writer.writerows(output_data)    
+
+
+def read_input_csv(filename):
+    with open(filename, 'r') as file:
+        csv_reader = csv.DictReader(file, fieldnames=HEADER)
         data = [row for row in csv_reader]
     starting_index = random.randint(0, len(data) - 10) # minus 10 to make sure we have at least 10 consecutive data points
     return data[starting_index : starting_index + 10]
 
 # using the algo provided in the pdf
 def get_predicted_data(input_data):
-    # make an array of stock values only for easier use
+    # make an array of stock values only (for ease of use)
     stock_values = [  float(item['value']) for item in input_data]
     n = stock_values[-1]
 
@@ -57,6 +65,8 @@ def get_predicted_data(input_data):
     }
         predicted_data.append(new_entry)
     output_data.extend(predicted_data)
+
+    return output_data
 
 
 if __name__ == "__main__":
