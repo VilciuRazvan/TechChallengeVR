@@ -6,31 +6,35 @@ from datetime import datetime, timedelta
 import sys
 
 HEADER = ['tick', 'date', 'value']
+PREDICTION_DIRECTORY = 'predictions/'
+INVALID_ARG_VALUE = "Argument must be 1 or 2"
+INVALID_ARG_NOT_INT = "Argument must be an integer"
+INVALID_USAGE_MSG = "Invalid use. Please use python main.py [1|2]"
 
 def main():
     filenames = get_pwd_csvs() # get all .csv file names in the current directory
-    if (len(filenames) < 1):
+    if len(filenames) < 1:
         print("No .csv files found in the current working directory.")
         return
     
-    if (len(sys.argv) == 1): # no arg provided - parse and predict from all files
+    if len(sys.argv) == 1: # no arg provided - parse and predict from all files
         for file in filenames:
             process_file(file)
     
-    elif (len(sys.argv) == 2): # another arg provided
+    elif len(sys.argv) == 2: # another arg provided
         try:
             arg = int(sys.argv[1])
-            if (arg == 1): # process only 1 file, as requested in the task
+            if arg == 1: # process only 1 file, as requested in the task
                 process_file(filenames[0])
-            elif (arg == 2): # process the 2 files, as requested in the task
+            elif arg == 2: # process the 2 files, as requested in the task
                 for file in filenames[:2]:
                     process_file(file)
             else:
-                print("Argument must be 1 or 2")
+                print(INVALID_ARG_VALUE)
         except ValueError:
-            print("Argument must be an integer")
+            print(INVALID_ARG_NOT_INT)
     else: # 2+ args provided
-        print("Invalid use. Please use python main.py [1|2]")        
+        print(INVALID_USAGE_MSG)        
         
 def process_file(file):
     input_data = read_input_csv(file) # read .csv content into a list dict
@@ -43,7 +47,7 @@ def get_pwd_csvs():
 
 def write_csv(file, output_data):
     new_file_name = file.replace('.csv', '_predict.csv')
-    path = 'predictions/' + new_file_name
+    path = os.path.join(PREDICTION_DIRECTORY, new_file_name)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=HEADER)
