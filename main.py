@@ -3,20 +3,42 @@ import os
 import random
 from glob import glob
 from datetime import datetime, timedelta
+import sys
 
 HEADER = ['tick', 'date', 'value']
 
 def main():
     filenames = get_pwd_csvs() # get all .csv file names in the current directory
-    for file in filenames:
-        input_data = read_input_csv(file) # read .csv content into a list dict
-        output_data = get_predicted_data(input_data) # return the input + predicted values into a list dict
-        write_csv(file, output_data)
+    if (len(filenames) < 1):
+        print("No .csv files found in the current working directory.")
+        return
+    
+    if (len(sys.argv) == 1): # no arg provided - parse and predict from all files
+        for file in filenames:
+            process_file(file)
+    
+    elif (len(sys.argv) == 2): # another arg provided
+        try:
+            arg = int(sys.argv[1])
+            if (arg == 1): # process only 1 file, as requested in the task
+                process_file(filenames[0])
+            elif (arg == 2): # process the 2 files, as requested in the task
+                for file in filenames[:2]:
+                    process_file(file)
+            else:
+                print("Argument must be 1 or 2")
+        except ValueError:
+            print("Argument must be an integer")
+    else: # 2+ args provided
+        print("Invalid use. Please use python main.py [1|2]")        
         
+def process_file(file):
+    input_data = read_input_csv(file) # read .csv content into a list dict
+    output_data = get_predicted_data(input_data) # return the input + predicted values into a list dict
+    write_csv(file, output_data)
+
 def get_pwd_csvs():
     filenames = glob("*.csv") # get the .csv filename from the current folder
-    if (len(filenames) < 1):
-        raise Exception("No .csv files found in the current working directory.")
     return filenames
 
 def write_csv(file, output_data):
